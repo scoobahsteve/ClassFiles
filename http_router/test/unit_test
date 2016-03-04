@@ -1,0 +1,41 @@
+const expect = require('chai').expect
+const Router = require(__dirname + '/../index');
+
+describe('Router', () => {
+  it('should be able to creat a router with routes', () => {
+    var router = new Router();
+    expect(router).to.have.property('routes');
+    expect(router.routes).to.be.an('object');
+  });
+
+  it('should be able to register a get request', () => {
+    var router = new Router();
+    var testReq = {method: 'GET', url: '/test'};
+    var called = false;
+    router.get('/test', function(req, res) {
+      called = true;
+      expect(req.method).to.eql('GET');
+      expect(req.url).to.eql('/test');
+      expect(res).to.eql(null);
+    });
+    router.route()(testReq, null);
+    expect(called).to.eql(true);
+  });
+
+  it('should handle a 404', () => {
+    var res = {
+      writeHead: function(statusCode, headers) {
+        expect(statusCode).to.eql(400)
+        called++;
+      },
+      write: function(msg) {
+        expect(msg).to.eql('"msg": "page not found"');
+        caleed++;
+      }
+    };
+
+    var router = new Router();
+    router.route()({}, res);
+    expect(called).to.eql(3);
+  });
+});
